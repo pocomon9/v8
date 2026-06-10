@@ -1,0 +1,210 @@
+name: poco v1
+
+on:
+  repository_dispatch:
+    types: [rebirth-trigger]
+  workflow_dispatch:
+    inputs:
+      run_mode:
+        description: Boot validation or full poco cycle
+        required: true
+        default: full
+        type: choice
+        options:
+          - boot
+          - full
+      run_hours:
+        description: Hours to run for full mode
+        required: false
+        default: "5.0"
+        type: string
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poco-${{ github.repository }}
+  cancel-in-progress: true
+
+env:
+  RUN_HOURS: "5.0"
+  poco_MAX_RUNTIME_HOURS: "4.5"
+  poco_REPO_TEMPLATE: "v{iteration}"
+  poco_REPO_PRIVATE: "0"
+  poco_DELETE_PREVIOUS_REPO_ON_BOOT: "1"
+  poco_TRIGGER_AFTER_PUSH: "1"
+  poco_CLEAR_WDM_CACHE: "0"
+  poco_PROFILE_DIRECTORY: "Default"
+  poco_WINDOW_SIZE: "1345x610"
+  poco_PROFILE_PATH: "/app/chromium"
+  poco_NO_HEADLESS: "0"
+  poco_USE_XVFB: "0"
+  poco_DRIVER_BINARY: ""
+  poco_EXTRA_CHROME_ARGUMENTS: ""
+  poco_EXTRA_BINARY_CANDIDATES: ""
+  poco_ENABLE_TREND_RESEARCH: "1"
+  poco_ENABLE_X_POSTS: "1"
+  poco_ENABLE_X_COMMENTS: "1"
+  poco_ENABLE_X_REPLIES: "0"
+  poco_ENABLE_TREND_COMMENTS: "1"
+  poco_X_SEARCH_MODE: "top"
+  poco_REQUIRE_MEDIA_FOR_X_POSTS: "1"
+  poco_MIN_SOURCE_LIKES: "2200"
+  poco_MIN_SOURCE_REPOSTS: "220"
+  poco_MIN_SOURCE_REPLIES: "35"
+  poco_MIN_SOURCE_VIEWS_IF_VISIBLE: "250000"
+  poco_MIN_SOURCE_COMBINED: "3600"
+  poco_MIN_COMMENT_SOURCE_LIKES: "1600"
+  poco_MIN_COMMENT_SOURCE_REPLIES: "60"
+  poco_MIN_COMMENT_SOURCE_VIEWS: "150000"
+  poco_MIN_COMMENT_SOURCE_COMBINED: "2400"
+  poco_MAX_TREND_COMMENTS_PER_CYCLE: "2"
+  poco_COMMENT_COOLDOWN_SECONDS: "18"
+  poco_POST_STYLE: "question-led"
+  poco_ENABLE_LOCAL_OLLAMA: "1"
+  poco_PREFER_LOCAL_OLLAMA: "1"
+  poco_LLM_PREFERENCE: "local-first"
+  poco_ENABLE_DYNAMIC_TREND_QUERIES: "0"
+  poco_ALLOW_SIMULATED_TRENDS: "0"
+  poco_SNAPSHOT_RETENTION: "8"
+  poco_PRIMARY_MODEL: "tinyllama"
+  poco_OLLAMA_MODELS: "tinyllama"
+  poco_BOOTSTRAP_MODELS: "tinyllama"
+  poco_MODEL_DIRECTOR: "tinyllama"
+  poco_MODEL_TREND: "tinyllama"
+  poco_MODEL_CREATOR: "tinyllama"
+  poco_MODEL_REPHRASE: "tinyllama"
+  poco_MODEL_SELECTOR: "tinyllama"
+  poco_MODEL_CODING: "tinyllama"
+  poco_MODEL_SUMMARY: "tinyllama"
+  poco_MODEL_QUICK: "tinyllama"
+  poco_OLLAMA_BOOT_TIMEOUT_SECONDS: "90"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  run:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 355
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Build poco container
+        run: docker build -t poco-v1:latest .
+
+      - name: Run poco inside Docker
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT_FG: ${{ secrets.GH_PAT_FG }}
+          OLLAMA_HOST: ${{ secrets.OLLAMA_HOST }}
+          poco_GITHUB_USERNAME: ${{ secrets.poco_GITHUB_USERNAME }}
+          poco_GITHUB_PASSWORD: ${{ secrets.poco_GITHUB_PASSWORD }}
+          poco_X_USERNAME: ${{ secrets.poco_X_USERNAME }}
+          poco_X_PASSWORD: ${{ secrets.poco_X_PASSWORD }}
+          poco_X_DM_PASSCODE: ${{ secrets.poco_X_DM_PASSCODE }}
+          poco_GOOGLE_EMAIL: ${{ secrets.poco_GOOGLE_EMAIL }}
+          poco_GOOGLE_PASSWORD: ${{ secrets.poco_GOOGLE_PASSWORD }}
+          poco_PROTON_USERNAME: ${{ secrets.poco_PROTON_USERNAME }}
+          poco_PROTON_PASSWORD: ${{ secrets.poco_PROTON_PASSWORD }}
+          poco_CHATGPT_EMAIL: ${{ secrets.poco_CHATGPT_EMAIL }}
+          poco_CHATGPT_PASSWORD: ${{ secrets.poco_CHATGPT_PASSWORD }}
+          poco_DEEPSEEK_EMAIL: ${{ secrets.poco_DEEPSEEK_EMAIL }}
+          poco_DEEPSEEK_PASSWORD: ${{ secrets.poco_DEEPSEEK_PASSWORD }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          HOURS="$RUN_HOURS"
+          BOOT_ONLY="0"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.run_mode }}" = "boot" ]; then
+              BOOT_ONLY="1"
+            fi
+            if [ -n "${{ github.event.inputs.run_hours }}" ]; then
+              HOURS="${{ github.event.inputs.run_hours }}"
+            fi
+          fi
+
+          docker run --rm --shm-size=2g \
+            -e GH_PAT \
+            -e GH_PAT_FG \
+            -e OLLAMA_HOST \
+            -e GITHUB_REPOSITORY \
+            -e GITHUB_ACTIONS=true \
+            -e CI=true \
+            -e DISPLAY=:99 \
+            -e CHROMIUM_PATH=/usr/bin/ungoogled-chromium \
+            -e poco_CHROMIUM_BINARY=/usr/bin/ungoogled-chromium \
+            -e poco_PROFILE_PATH="${{ env.poco_PROFILE_PATH }}" \
+            -e poco_PROFILE_DIRECTORY="${{ env.poco_PROFILE_DIRECTORY }}" \
+            -e poco_WINDOW_SIZE="${{ env.poco_WINDOW_SIZE }}" \
+            -e poco_NO_HEADLESS="${{ env.poco_NO_HEADLESS }}" \
+            -e poco_USE_XVFB="${{ env.poco_USE_XVFB }}" \
+            -e poco_DRIVER_BINARY="${{ env.poco_DRIVER_BINARY }}" \
+            -e poco_EXTRA_CHROME_ARGUMENTS="${{ env.poco_EXTRA_CHROME_ARGUMENTS }}" \
+            -e poco_EXTRA_BINARY_CANDIDATES="${{ env.poco_EXTRA_BINARY_CANDIDATES }}" \
+            -e poco_GITHUB_USERNAME \
+            -e poco_GITHUB_PASSWORD \
+            -e poco_X_USERNAME \
+            -e poco_X_PASSWORD \
+            -e poco_X_DM_PASSCODE \
+            -e poco_GOOGLE_EMAIL \
+            -e poco_GOOGLE_PASSWORD \
+            -e poco_PROTON_USERNAME \
+            -e poco_PROTON_PASSWORD \
+            -e poco_CHATGPT_EMAIL \
+            -e poco_CHATGPT_PASSWORD \
+            -e poco_DEEPSEEK_EMAIL \
+            -e poco_DEEPSEEK_PASSWORD \
+            -e poco_BOOT_SEQUENCE_ONLY="$BOOT_ONLY" \
+            -e poco_RUN_HOURS_OVERRIDE="$HOURS" \
+            -e poco_REPO_TEMPLATE="${{ env.poco_REPO_TEMPLATE }}" \
+            -e poco_REPO_PRIVATE="${{ env.poco_REPO_PRIVATE }}" \
+            -e poco_DELETE_PREVIOUS_REPO_ON_BOOT="${{ env.poco_DELETE_PREVIOUS_REPO_ON_BOOT }}" \
+            -e poco_TRIGGER_AFTER_PUSH="${{ env.poco_TRIGGER_AFTER_PUSH }}" \
+            -e poco_CLEAR_WDM_CACHE="${{ env.poco_CLEAR_WDM_CACHE }}" \
+            -e poco_ENABLE_TREND_RESEARCH="${{ env.poco_ENABLE_TREND_RESEARCH }}" \
+            -e poco_ENABLE_X_POSTS="${{ env.poco_ENABLE_X_POSTS }}" \
+            -e poco_ENABLE_X_COMMENTS="${{ env.poco_ENABLE_X_COMMENTS }}" \
+            -e poco_ENABLE_X_REPLIES="${{ env.poco_ENABLE_X_REPLIES }}" \
+            -e poco_ENABLE_TREND_COMMENTS="${{ env.poco_ENABLE_TREND_COMMENTS }}" \
+            -e poco_X_SEARCH_MODE="${{ env.poco_X_SEARCH_MODE }}" \
+            -e poco_REQUIRE_MEDIA_FOR_X_POSTS="${{ env.poco_REQUIRE_MEDIA_FOR_X_POSTS }}" \
+            -e poco_MIN_SOURCE_LIKES="${{ env.poco_MIN_SOURCE_LIKES }}" \
+            -e poco_MIN_SOURCE_REPOSTS="${{ env.poco_MIN_SOURCE_REPOSTS }}" \
+            -e poco_MIN_SOURCE_VIEWS_IF_VISIBLE="${{ env.poco_MIN_SOURCE_VIEWS_IF_VISIBLE }}" \
+            -e poco_MIN_SOURCE_COMBINED="${{ env.poco_MIN_SOURCE_COMBINED }}" \
+            -e poco_MIN_COMMENT_SOURCE_LIKES="${{ env.poco_MIN_COMMENT_SOURCE_LIKES }}" \
+            -e poco_MIN_COMMENT_SOURCE_REPLIES="${{ env.poco_MIN_COMMENT_SOURCE_REPLIES }}" \
+            -e poco_MIN_COMMENT_SOURCE_VIEWS="${{ env.poco_MIN_COMMENT_SOURCE_VIEWS }}" \
+            -e poco_MIN_COMMENT_SOURCE_COMBINED="${{ env.poco_MIN_COMMENT_SOURCE_COMBINED }}" \
+            -e poco_MAX_TREND_COMMENTS_PER_CYCLE="${{ env.poco_MAX_TREND_COMMENTS_PER_CYCLE }}" \
+            -e poco_COMMENT_COOLDOWN_SECONDS="${{ env.poco_COMMENT_COOLDOWN_SECONDS }}" \
+            -e poco_POST_STYLE="${{ env.poco_POST_STYLE }}" \
+            -e poco_ENABLE_LOCAL_OLLAMA="${{ env.poco_ENABLE_LOCAL_OLLAMA }}" \
+            -e poco_PREFER_LOCAL_OLLAMA="${{ env.poco_PREFER_LOCAL_OLLAMA }}" \
+            -e poco_LLM_PREFERENCE="${{ env.poco_LLM_PREFERENCE }}" \
+            -e poco_ENABLE_DYNAMIC_TREND_QUERIES="${{ env.poco_ENABLE_DYNAMIC_TREND_QUERIES }}" \
+            -e poco_ALLOW_SIMULATED_TRENDS="${{ env.poco_ALLOW_SIMULATED_TRENDS }}" \
+            -e poco_SNAPSHOT_RETENTION="${{ env.poco_SNAPSHOT_RETENTION }}" \
+            -e poco_MAX_RUNTIME_HOURS="${{ env.poco_MAX_RUNTIME_HOURS }}" \
+            -e poco_OLLAMA_BOOT_TIMEOUT_SECONDS="${{ env.poco_OLLAMA_BOOT_TIMEOUT_SECONDS }}" \
+            -e poco_PRIMARY_MODEL="${{ env.poco_PRIMARY_MODEL }}" \
+            -e poco_OLLAMA_MODELS="${{ env.poco_OLLAMA_MODELS }}" \
+            -e poco_BOOTSTRAP_MODELS="${{ env.poco_BOOTSTRAP_MODELS }}" \
+            -e poco_MODEL_DIRECTOR="${{ env.poco_MODEL_DIRECTOR }}" \
+            -e poco_MODEL_TREND="${{ env.poco_MODEL_TREND }}" \
+            -e poco_MODEL_CREATOR="${{ env.poco_MODEL_CREATOR }}" \
+            -e poco_MODEL_REPHRASE="${{ env.poco_MODEL_REPHRASE }}" \
+            -e poco_MODEL_SELECTOR="${{ env.poco_MODEL_SELECTOR }}" \
+            -e poco_MODEL_CODING="${{ env.poco_MODEL_CODING }}" \
+            -e poco_MODEL_SUMMARY="${{ env.poco_MODEL_SUMMARY }}" \
+            -e poco_MODEL_QUICK="${{ env.poco_MODEL_QUICK }}" \
+            -e PYTHONUNBUFFERED=1 \
+            -v "${{ github.workspace }}:/app" \
+            -w /app \
+            poco-v1:latest \
+            bash -lc 'mkdir -p data/snapshots chromium && [ -f iteration.txt ] || echo "1" > iteration.txt && [ -f task.txt ] || : > task.txt && [ -f prev_repo.txt ] || : > prev_repo.txt && cp iteration.txt data/iteration.txt || true && chmod +x scripts/bootstrap_ollama.sh && . ./scripts/bootstrap_ollama.sh && HEADLESS_FLAG="" && if [ "${poco_NO_HEADLESS:-0}" = "1" ]; then HEADLESS_FLAG="--no-headless"; fi && if [ "${poco_USE_XVFB:-0}" = "1" ]; then Xvfb :99 -screen 0 1366x768x24 >/tmp/xvfb.log 2>&1 & fi && if [ "$poco_BOOT_SEQUENCE_ONLY" = "1" ]; then python3 poco.py --run-hours "$poco_RUN_HOURS_OVERRIDE" --boot-validation-only $HEADLESS_FLAG; else python3 poco.py --run-hours "$poco_RUN_HOURS_OVERRIDE" $HEADLESS_FLAG; fi'

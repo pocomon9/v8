@@ -1,0 +1,24 @@
+{
+  "next_iteration": 2,
+  "new_repo_name": "v2",
+  "new_repo_url": "https://github.com/PocoPrime1112/v2",
+  "current_repo": "final-puss",
+  "snapshot_path": "D:\\DHRUV\\Aii\\poco\\data\\snapshots\\iter_1",
+  "belief_count": 7,
+  "memory_stats": {
+    "beliefs": 7,
+    "memories": 3,
+    "interactions": 0,
+    "lineage": 0,
+    "performance": 0,
+    "reflections": 0,
+    "working_memory": 2,
+    "selector_strategies": 0,
+    "source_assets": 36,
+    "posted_sources": 0,
+    "engaged_sources": 0
+  },
+  "codex_purpose": "Operational memory scaffold for Poco.",
+  "ancestor_repo": "final-puss",
+  "private_repo": false
+}

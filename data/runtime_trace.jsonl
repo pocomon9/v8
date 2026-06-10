@@ -1,0 +1,22 @@
+{"timestamp": "2026-06-10T11:14:11.539369Z", "iteration": 1, "repo": "final-puss", "stage": "run", "status": "start", "details": {"hours_per_run": 5.0, "effective_hours": 5.0, "profile": "D:\\DHRUV\\Aii\\poco\\chromium"}}
+{"timestamp": "2026-06-10T11:14:11.540543Z", "iteration": 1, "repo": "final-puss", "stage": "schedule", "status": "ready", "details": {"post_window_minutes": [15, 180], "comment_window_minutes": [6, 12], "next_post_seconds": 4800, "next_comment_seconds": 420}}
+{"timestamp": "2026-06-10T11:14:11.543461Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.562704Z", "iteration": 1, "repo": "final-puss", "stage": "x_post", "status": "no_candidate", "details": {}}
+{"timestamp": "2026-06-10T11:14:11.563178Z", "iteration": 1, "repo": "final-puss", "stage": "public_comment_budget", "status": "reset", "details": {"reason": "initial_post", "budget": 6}}
+{"timestamp": "2026-06-10T11:14:11.563774Z", "iteration": 1, "repo": "final-puss", "stage": "public_image_comments", "status": "start", "details": {"trigger": "initial_post_burst", "requested": 1, "budget_remaining": 6}}
+{"timestamp": "2026-06-10T11:14:11.575375Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.595399Z", "iteration": 1, "repo": "final-puss", "stage": "trend_comments", "status": "complete", "details": {"commented": 0, "attempted": 0}}
+{"timestamp": "2026-06-10T11:14:11.595399Z", "iteration": 1, "repo": "final-puss", "stage": "public_image_comments", "status": "start", "details": {"trigger": "initial_post_burst", "requested": 1, "budget_remaining": 6}}
+{"timestamp": "2026-06-10T11:14:11.599762Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.618566Z", "iteration": 1, "repo": "final-puss", "stage": "trend_comments", "status": "complete", "details": {"commented": 0, "attempted": 0}}
+{"timestamp": "2026-06-10T11:14:11.618566Z", "iteration": 1, "repo": "final-puss", "stage": "public_image_comments", "status": "start", "details": {"trigger": "initial_post_burst", "requested": 1, "budget_remaining": 6}}
+{"timestamp": "2026-06-10T11:14:11.623856Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.643891Z", "iteration": 1, "repo": "final-puss", "stage": "trend_comments", "status": "complete", "details": {"commented": 0, "attempted": 0}}
+{"timestamp": "2026-06-10T11:14:11.643891Z", "iteration": 1, "repo": "final-puss", "stage": "public_image_comments", "status": "start", "details": {"trigger": "initial_post_burst", "requested": 1, "budget_remaining": 6}}
+{"timestamp": "2026-06-10T11:14:11.648540Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.667799Z", "iteration": 1, "repo": "final-puss", "stage": "trend_comments", "status": "complete", "details": {"commented": 0, "attempted": 0}}
+{"timestamp": "2026-06-10T11:14:11.668379Z", "iteration": 1, "repo": "final-puss", "stage": "public_image_comments", "status": "start", "details": {"trigger": "initial_post_burst", "requested": 2, "budget_remaining": 6}}
+{"timestamp": "2026-06-10T11:14:11.673160Z", "iteration": 1, "repo": "final-puss", "stage": "trend_queries", "status": "ready", "details": {"count": 8}}
+{"timestamp": "2026-06-10T11:14:11.692501Z", "iteration": 1, "repo": "final-puss", "stage": "trend_comments", "status": "complete", "details": {"commented": 0, "attempted": 0}}
+{"timestamp": "2026-06-10T11:14:11.694040Z", "iteration": 1, "repo": "final-puss", "stage": "schedule", "status": "deadline_ready", "details": {"shutdown_margin_seconds": 2400}}
+{"timestamp": "2026-06-10T11:14:16.694775Z", "iteration": 1, "repo": "final-puss", "stage": "schedule", "status": "shutdown_margin_entered", "details": {"seconds_left": 17994}}
